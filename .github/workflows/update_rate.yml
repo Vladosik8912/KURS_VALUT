@@ -1,0 +1,49 @@
+name: Update USD/RUB Rate
+on:
+  schedule:
+    - cron: '0 * * * *'  # Каждый час
+  workflow_dispatch:     # Ручной запуск
+
+jobs:
+  update-rate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # Права на запись
+    
+    steps:
+      # 1. Загрузка репозитория
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # 2. Установка Python
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      # 3. Установка зависимостей
+      - name: Install dependencies
+        run: pip install requests
+      
+      # 4. Запуск скрипта
+      - name: Fetch currency rate
+        run: python fetch_currency.py
+      
+      # 5. Коммит и пуш изменений
+      - name: Commit & Push
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add usd_rub_rate.json
+          
+          # Проверяем есть ли изменения
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "🟢 Нет изменений"
+          else
+            git commit -m "Auto: Update USD/RUB rate"
+            git pull --rebase
+            git push
+            echo "🚀 Изменения отправлены!"
+          fi
