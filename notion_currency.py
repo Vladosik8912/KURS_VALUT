@@ -3,8 +3,8 @@ import requests
 from datetime import datetime
 
 # Конфигурация
-NOTION_TOKEN = os.getenv('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')
-DATABASE_ID = os.getenv('20879c7a7931808491dfd5f04815a2ee')
+NOTION_TOKEN = os.getenv('NOTION_TOKEN')
+DATABASE_ID = os.getenv('DATABASE_ID')
 
 def get_usd_rate():
     """Получаем курс USD от ЦБ РФ"""
